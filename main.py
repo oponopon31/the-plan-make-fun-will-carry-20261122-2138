@@ -33,9 +33,18 @@ def main() -> None:
         f.write(text)
 
     digest = hashlib.sha256(data).hexdigest()
+
+    # Post-write verification: re-read the file and confirm the bytes on
+    # disk are exactly what was intended before reporting success.
+    with open(path, "rb") as f:
+        written = f.read()
+    assert written == data, "entry.txt bytes differ from intended plan"
+    assert hashlib.sha256(written).hexdigest() == digest, "sha256 mismatch"
+
     print(f"chars: {count}")
     print(f"sha256: {digest}")
     print(f"wrote: {path}")
+    print("verified: entry.txt bytes match the plan exactly")
 
 
 if __name__ == "__main__":
